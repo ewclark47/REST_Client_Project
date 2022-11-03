@@ -2,7 +2,7 @@
 // The service provides GET, DELETE, and PUT
 // Simple example client storing and deleting name, value pairs on the server
 
-package edu.cmu.andrew.mm6;
+package edu.cmu.andrew.elliottc;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class Main {
         System.out.println(read("Line3"));
 
         //Code commented out for the moment
-        //System.out.println(getVariableList());
+        System.out.println(getVariableList());
 
         System.out.println("End main of REST lab");
 
@@ -88,7 +88,7 @@ public class Main {
         Result result = new Result();
         try {
             // GET wants us to pass the name on the URL line
-            URL url = new URL("http://localhost:8080/RESTServicePrj-1.0-SNAPSHOT/api/variable-memory/" + name);
+            URL url = new URL("http://localhost:9090/RESTServicePrj-1.0-SNAPSHOT/api/variable-memory/" + name);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             // we are sending plain text
@@ -135,7 +135,7 @@ public class Main {
         try {
             // establish the URL
             // Note, PUT does not use the URL line for its message to the server
-            URL url = new URL("http://localhost:8080/RESTServicePrj-1.0-SNAPSHOT/api/variable-memory/");
+            URL url = new URL("http://localhost:9090/RESTServicePrj-1.0-SNAPSHOT/api/variable-memory/");
             conn = (HttpURLConnection) url.openConnection();
             // we are sending plain text
             conn.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
@@ -183,7 +183,7 @@ public class Main {
 
         // Send an HTTP DELETE to server along with name on the URL line
         try {
-            URL url = new URL("http://localhost:8080/RESTServicePrj-1.0-SNAPSHOT/api/variable-memory/" + name);
+            URL url = new URL("http://localhost:9090/RESTServicePrj-1.0-SNAPSHOT/api/variable-memory/" + name);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("DELETE");
             // we are sending plain text
@@ -225,6 +225,49 @@ public class Main {
             System.out.println("Exception caught " + e);
         }
         return responseText;
+    }
+
+    public static Result getVariableList() {
+
+        HttpURLConnection conn;
+        int status = 0;
+        Result result = new Result();
+        try {
+            // GET wants us to pass the name on the URL line
+            URL url = new URL("http://localhost:9090/RESTServicePrj-1.0-SNAPSHOT/api/variable-memory/list/variables");
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            // we are sending plain text
+            conn.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
+            // tell the server what format we want back
+            conn.setRequestProperty("Accept", "text/plain");
+
+            // wait for response
+            status = conn.getResponseCode();
+
+            // set http response code
+            result.setResponseCode(status);
+            // set http response message - this is just a status message
+            // and not the body returned by GET
+            result.setResponseText(conn.getResponseMessage());
+
+            if (status == 200) {
+                String responseBody = getResponseBody(conn);
+                result.setResponseText(responseBody);
+            }
+
+            conn.disconnect();
+
+        }
+        // handle exceptions
+        catch (MalformedURLException e) {
+            System.out.println("URL Exception thrown" + e);
+        } catch (IOException e) {
+            System.out.println("IO Exception thrown" + e);
+        } catch (Exception e) {
+            System.out.println("IO Exception thrown" + e);
+        }
+        return result;
     }
 }
 
